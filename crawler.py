@@ -1,20 +1,20 @@
-from requests import RequestException, get
+from requests import RequestException
 from urllib.parse import urljoin
 import logging
-from bs4 import BeautifulSoup
-from agent import get_random_user_agent
+from bs4 import BeautifulSoup as bs
+from request import req
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
 url = 'https://book.douban.com/top250'
 
-def crawl_single_url(url:str):
+def crawl_single_url(_url:str):
   try:
-    res = get(url, headers={
-      'User-Agent': get_random_user_agent()
-    })
+    res = req(
+      url=_url
+    )
     if res.status_code == 200:
-      soup = BeautifulSoup(res.text, 'html.parser')
+      soup = bs(res.text, 'html.parser')
       items = soup.select('div.indent table tr.item')
       for item in items:
         # 封面url
@@ -41,6 +41,7 @@ def crawl_single_url(url:str):
           intro = intro_span.get_text()
         # 详情页链接
         link = item.find('a', { 'class': 'nbg' })['href']
+        print(link)
     elif res.status_code >= 400 and res.status_code < 500:
       logging.error('request error')
   except RequestException as e:
