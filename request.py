@@ -12,19 +12,19 @@ def get_free_proxies():
     url,
     headers={
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Encoding': 'gzip, deflate',
       'Accept-Language': 'en-US,en;q=0.5',
       'Connection': 'keep-alive',
       'Referer': 'https://www.google.com/',
       'User-Agent': get_random_user_agent(),
     },
     proxies={
-      'https': '127.0.0.1:7890' # 本机的代理
+      'https': '127.0.0.1:7890' # 本机的代理, 否则无法访问此 url
     },
     timeout=1.5,
   )
-  soup = bs(res.text, "html.parser")
-  # FIXME: soup 乱码
+  # soup = bs(brotli., "html.parser")
+  soup = bs(res.text, 'html.parser')
   proxies = []
   for row in soup.find("table", {"class": "table"}).find_all("tr")[1:]:
     tds = row.find_all("td")
@@ -46,15 +46,17 @@ def req(**kwargs):
     with Session() as session:
       proxy = random.choice(get_free_proxies())
       proxies={
-        'http': proxy.host,
-      },
-      if proxy.https == True:
-        proxies['https'] = proxy.host
+        'http': proxy['host'],
+      }
+      if proxy['https'] == True:
+        proxies.update({
+          'https': proxy['host']
+        })
       response = session.get(
         headers={
           'User-Agent': get_random_user_agent()
         },
-        proxies=proxies
+        proxies=proxies,
         **kwargs,
       )
       if response.status_code == 200:
