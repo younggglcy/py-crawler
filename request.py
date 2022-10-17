@@ -55,7 +55,7 @@ def req(**kwargs):
       response = session.get(
         headers={
           'User-Agent': get_random_user_agent()
-        },
+        }.update(kwargs = kwargs),
         proxies=proxies,
         **kwargs,
       )

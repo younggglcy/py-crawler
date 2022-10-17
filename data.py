@@ -4,8 +4,10 @@ from nltk.tokenize import word_tokenize
 from string import punctuation
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+from csv import DictReader
 
-def process(s:str) -> List[str]:
+def process():
+  s = get_all_comments()
   # 分词
   # tokens = word_tokenize(s, 'chinese')  # 暂时没有支持 chinese
   tokens = word_tokenize(s)
@@ -32,3 +34,11 @@ def clear_stopwords(tokens: List[str]) -> List[str]:
 def process_stem(tokens: List[str]) -> List[str]:
   s = PorterStemmer()
   return [s.stem(token) for token in tokens]
+
+def get_all_comments() -> str:
+  ret = ''
+  with open('comments.csv', 'r') as f:
+    reader = DictReader(f, 'comment')
+    for row in reader:
+      ret += row
+  return ret
