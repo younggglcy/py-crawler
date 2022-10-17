@@ -13,39 +13,39 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(m
 url = 'https://book.douban.com/top250'
 
 def crawl_comments(_url:str):
-  for i in range(25):
-    page_url = urljoin(_url, '?start={0}'.format(20 * i))
-    try:
-      with open('cfg.yml', 'r') as _config:
-        config = safe_load(_config)
-        logging.info('start crawling comments for {0}'.format(page_url))
-        res = req(url=page_url, headers={
-          'User-Agent': get_random_user_agent(),
-          'Cookie': config['cookie']
-        })
-        if res.status_code == 200:
-          with open('comments.csv', 'a') as f:
-            writer = DictWriter(f, ('recommended_level', 'user_name', 'comment'))
-            writer.writeheader()
-            soup = bs(res.text, 'html.parser')
-            comments_lists = soup.find_all('div', { 'class': 'comment' })
-            for item in comments_lists:
-              # 推荐等级
-              recommended_level = item.find('span', { 'class': 'comment-vote' }).find('a').text
-              # 用户名
-              user_name = item.find('span', { 'class': 'comment-info' }).find('a').text
-              # 短评
-              comment = item.find('span', { 'class': 'short' }).text
-              dict = {
-                'recommended_level': recommended_level,
-                'user_name': user_name,
-                'comment': comment
-              }
-              writer.writerow(dict)
-        elif res.status_code >= 400 and res.status_code < 500:
-          break
-    except RequestException as e:
-      logging.error('request exception: {0}'.format(e))
+  with open('cfg.yml', 'r') as _config:
+    config = safe_load(_config)
+    for i in range(25):
+      page_url = urljoin(_url, '?start={0}'.format(20 * i))
+      try:
+          logging.info('start crawling comments for {0}'.format(page_url))
+          res = req(url=page_url, headers={
+            'User-Agent': get_random_user_agent(),
+            'Cookie': config['cookie']
+          })
+          if res.status_code == 200:
+            with open('comments.csv', 'a') as f:
+              writer = DictWriter(f, ('recommended_level', 'user_name', 'comment'))
+              writer.writeheader()
+              soup = bs(res.text, 'html.parser')
+              comments_lists = soup.find_all('div', { 'class': 'comment' })
+              for item in comments_lists:
+                # 推荐等级
+                recommended_level = item.find('span', { 'class': 'comment-vote' }).find('a').text
+                # 用户名
+                user_name = item.find('span', { 'class': 'comment-info' }).find('a').text
+                # 短评
+                comment = item.find('span', { 'class': 'short' }).text
+                dict = {
+                  'recommended_level': recommended_level,
+                  'user_name': user_name,
+                  'comment': comment
+                }
+                writer.writerow(dict)
+          elif res.status_code >= 400 and res.status_code < 500:
+            break
+      except RequestException as e:
+        logging.error('request exception: {0}'.format(e))
 
 def crawl_single_url(_url:str):
   try:
