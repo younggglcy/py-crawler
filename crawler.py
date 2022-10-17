@@ -23,7 +23,7 @@ def crawl_comments(_url:str):
             'User-Agent': get_random_user_agent(),
             'Cookie': config['cookie']
           })
-          if res.status_code == 200:
+          if res and res.status_code == 200:
             with open('comments.csv', 'a') as f:
               writer = DictWriter(f, ('recommended_level', 'user_name', 'comment'))
               writer.writeheader()
@@ -42,7 +42,7 @@ def crawl_comments(_url:str):
                   'comment': comment
                 }
                 writer.writerow(dict)
-          elif res.status_code >= 400 and res.status_code < 500:
+          elif (not res) or (res.status_code >= 400 and res.status_code < 500):
             break
       except RequestException as e:
         logging.error('request exception: {0}'.format(e))
