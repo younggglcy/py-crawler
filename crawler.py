@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 import logging
 from bs4 import BeautifulSoup as bs
 from request import req
+from data import process
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
@@ -24,6 +25,7 @@ def crawl_comments(_url:str):
           user_name = item.find('span', { 'class': 'comment-info' }).find('a').text
           # 短评
           comment = item.find('span', { 'class': 'short' }).text
+          process(comment)
       elif res.status_code >= 400 and res.status_code < 500:
         break
     except RequestException as e:
@@ -75,4 +77,5 @@ def crawl():
     crawl_single_url(page_url)
   logging.info('finish crawling')
 
-crawl()
+if __name__ == '__main__':
+  crawl()
