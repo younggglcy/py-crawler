@@ -7,6 +7,7 @@ from data import process
 from csv import DictWriter
 from yaml import safe_load
 from os import path, remove
+from time import sleep
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
 
@@ -39,6 +40,8 @@ def crawl_comments(_url:str):
               writer.writerow(dict)
     except RequestException as e:
       logging.error('request exception: {0}'.format(e))
+    finally:
+      sleep(1)
 
 def crawl_single_url(_url:str):
   try:
@@ -96,6 +99,8 @@ def crawl_single_url(_url:str):
           crawl_comments(urljoin(link, 'comments/'))   
   except RequestException as e:
     logging.error('request exception: {0}'.format(e))
+  finally:
+    sleep(0.5)
 
 def crawl():
   for i in range(10):
