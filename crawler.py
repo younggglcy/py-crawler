@@ -37,6 +37,8 @@ def crawl_comments(_url:str):
                 'comment': comment
               }
               writer.writerow(dict)
+        else:
+          break
     except RequestException as e:
       logging.error('request exception: {0}'.format(e))
     finally:
@@ -96,6 +98,8 @@ def crawl_single_url(_url:str):
           }
           writer.writerow(dict)
           crawl_comments(urljoin(link, 'comments/'))   
+    else:
+      return
   except RequestException as e:
     logging.error('request exception: {0}'.format(e))
   finally:
