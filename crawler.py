@@ -2,10 +2,9 @@ from requests import RequestException
 from urllib.parse import urljoin
 import logging
 from bs4 import BeautifulSoup as bs
-from request import req, get_random_user_agent
+from request import req
 from data import process
 from csv import DictWriter
-from yaml import safe_load
 from os import path, remove
 from time import sleep
 
