@@ -7,6 +7,7 @@ from nltk.stem import PorterStemmer
 from csv import DictReader
 from nltk import FreqDist
 from math import log
+from wordcloud import WordCloud
 
 def process():
   comments = get_all_comments()
@@ -24,6 +25,8 @@ def process():
   tokens = process_stem(tokens)
   # 基于 TF-IDF 提取关键词, 暂定为前100个
   keywords = extract_keywords(tokens, reader, nums)
+  # 词云
+  process_wordcloud(keywords)
   return 
 
 def standardize(tokens: List[str]) -> List[str]:
@@ -85,3 +88,6 @@ def extract_keywords(tokens: List[str], reader, nums) -> List[str]:
       break
 
   return list(ret.keys())
+
+def process_wordcloud(keywords: List[str]):
+  wc = WordCloud().generate(keywords).to_file('workcloud')
