@@ -50,8 +50,8 @@ def crawl_single_url(_url:str):
       url = _url,
     )
     if res:
-      with open('books.csv', 'a') as f:
-        writer = DictWriter(f, (
+      with open('books.csv', 'a') as book_f:
+        writer = DictWriter(book_f, (
           'authors',
           'name',
           'cover_url',
