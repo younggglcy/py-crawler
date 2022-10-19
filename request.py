@@ -49,20 +49,21 @@ with open('cfg.yml', 'r') as f:
 
 def req(**kwargs):
   try:
-    with Session() as s:
-      # proxy = random.choice(get_free_proxies())
-      # proxies={
-      #   'http': proxy['host'],
-      # }
-      # if proxy['https'] == True:
-      #   proxies.update({
-      #     'https': proxy['host']
-      #   })
-      response = s.get(
+    # with Session() as s:
+      proxy = random.choice(get_free_proxies())
+      proxies={
+        'http': proxy['host'],
+      }
+      if proxy['https']:
+        proxies.update({
+          'https': proxy['host']
+        })
+      response = get(
+        url=kwargs['url'],
         headers={
-          # 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          # 'Accept-Encoding': 'gzip, deflate, br',
-          # 'Accept-Language': 'en-US,en;q=0.5',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Accept-Language': 'en-US,en;q=0.5',
           'Connection': 'keep-alive',
           'Cookie': cookie,
           'Host': 'book.douban.com',
@@ -70,12 +71,12 @@ def req(**kwargs):
           # 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0'
           # 'Referer': 'https://book.douban.com'
         }.update(kwargs = kwargs['headers'] if 'headers' in kwargs else None),
-        # proxies=proxies,
+        proxies=proxies,
         # proxies={
         #   'https': '127.0.0.1:7890',
         #   'http': '127.0.0.1:7890'
         # },
-        **kwargs
+        # **kwargs
       )
       if response and response.status_code == 200:
         return response
