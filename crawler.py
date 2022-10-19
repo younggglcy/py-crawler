@@ -3,9 +3,7 @@ from urllib.parse import urljoin
 import logging
 from bs4 import BeautifulSoup as bs
 from request import req
-from data import process
 from csv import DictWriter
-from os import path, remove
 from time import sleep
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
@@ -111,11 +109,3 @@ def crawl():
     logging.info('start crawling {0}'.format(page_url))
     crawl_single_url(page_url)
   logging.info('finish crawling')
-
-if __name__ == '__main__':
-  if path.exists('books.csv'):
-    remove('books.csv')
-  if path.exists('comments.csv'):
-    remove('comments.csv')
-  crawl()
-  process()
