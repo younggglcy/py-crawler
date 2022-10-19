@@ -50,28 +50,38 @@ with open('cfg.yml', 'r') as f:
 def req(**kwargs):
   try:
     # with Session() as s:
-      proxy = random.choice(get_free_proxies())
-      proxies={
-        'http': proxy['host'],
-      }
-      if proxy['https']:
-        proxies.update({
-          'https': proxy['host']
-        })
+      # proxy = random.choice(get_free_proxies())
+      # proxies={
+      #   'http': proxy['host'],
+      # }
+      # if proxy['https']:
+      #   proxies.update({
+      #     'https': proxy['host']
+      #   })
       response = get(
         url=kwargs['url'],
         headers={
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Accept-Language': 'en-US,en;q=0.5',
+          'User-Agent': get_UA(),
           'Connection': 'keep-alive',
-          'Cookie': cookie,
-          'Host': 'book.douban.com',
-          'User-Agent': get_random_user_agent(),
-          # 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0'
-          # 'Referer': 'https://book.douban.com'
-        }.update(kwargs = kwargs['headers'] if 'headers' in kwargs else None),
-        proxies=proxies,
+          'Cookie': cookie
+        }
+        # headers={
+        #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        #   'Accept-Encoding': 'gzip, deflate, br',
+        #   'Accept-Language': 'en-US,en;q=0.5',
+        #   'Connection': 'keep-alive',
+        #   'Cookie': cookie,
+        #   'Host': 'book.douban.com',
+        #   'User-Agent': get_random_user_agent(),
+        #   # 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0'
+        #   'Referer': 'https://baidu.com',
+        #   'Sec-Fetch-Dest': 'document',
+        #   'Sec-Fetch-Mode': 'navigate',
+        #   'Sec-Fetch-Site': 'none',
+        #   'Sec-Fetch-User': '?1',
+        #   'Upgrade-Insecure-Requests': '1'
+        # }.update(kwargs = kwargs['headers'] if 'headers' in kwargs else None),
+        # proxies=proxies,
         # proxies={
         #   'https': '127.0.0.1:7890',
         #   'http': '127.0.0.1:7890'
@@ -93,3 +103,11 @@ user_agent_rotator = UserAgent(software_names=software_names, operating_systems=
 # 利用 random_user_agent 这个包获得随机的 User-Agent
 def get_random_user_agent():
   return user_agent_rotator.get_random_user_agent()
+
+def get_UA():
+  ua = [
+    'Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0',
+    'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Mobile Safari/537.36 Edg/106.0.1370.47',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36'
+  ]
+  return random.choice(ua)
