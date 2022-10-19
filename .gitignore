@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 cfg.yml
 *.csv
+
+__files__

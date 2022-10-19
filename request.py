@@ -42,38 +42,47 @@ def get_free_proxies():
       continue
   return proxies
 
+global cookie
 with open('cfg.yml', 'r') as f:
   config = safe_load(f)
-  def req(**kwargs):
-    try:
-      with Session() as session:
-        # proxy = random.choice(get_free_proxies())
+  cookie = config['cookie']
+
+def req(**kwargs):
+  try:
+    with Session() as s:
+      # proxy = random.choice(get_free_proxies())
+      # proxies={
+      #   'http': proxy['host'],
+      # }
+      # if proxy['https'] == True:
+      #   proxies.update({
+      #     'https': proxy['host']
+      #   })
+      response = s.get(
+        headers={
+          # 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          # 'Accept-Encoding': 'gzip, deflate, br',
+          # 'Accept-Language': 'en-US,en;q=0.5',
+          'Connection': 'keep-alive',
+          'Cookie': cookie,
+          'Host': 'book.douban.com',
+          'User-Agent': get_random_user_agent(),
+          # 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0'
+          # 'Referer': 'https://book.douban.com'
+        }.update(kwargs = kwargs['headers'] if 'headers' in kwargs else None),
+        # proxies=proxies,
         # proxies={
-        #   'http': proxy['host'],
-        # }
-        # if proxy['https'] == True:
-        #   proxies.update({
-        #     'https': proxy['host']
-        #   })
-        response = session.get(
-          headers={
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-            'Cookie': config['book-cookie'],
-            'Host': 'book.douban.com',
-            'User-Agent': get_random_user_agent()
-          }.update(kwargs = kwargs),
-          # proxies=proxies.update(kwargs = kwargs),
-          **kwargs,
-        )
-        if response and response.status_code == 200:
-          return response
-        else:
-          logging.error('request failed, res: {0}'.format(response))
-    except RequestException as e:
-      logging.exception('exception {}'.format(e))
+        #   'https': '127.0.0.1:7890',
+        #   'http': '127.0.0.1:7890'
+        # },
+        **kwargs
+      )
+      if response and response.status_code == 200:
+        return response
+      else:
+        logging.error('request failed, res: {0}'.format(response))
+  except RequestException as e:
+    logging.exception('exception {}'.format(e))
 
 software_names = [SoftwareName.CHROME.value, SoftwareName.EDGE.value, SoftwareName.FIREFOX.value]
 operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value, OperatingSystem.MACOS.value]
