@@ -40,7 +40,7 @@ def crawl_comments(_url:str):
     except RequestException as e:
       logging.error('request exception: {0}'.format(e))
     finally:
-      sleep(1)
+      sleep(2)
 
 def crawl_single_url(_url:str):
   try:
@@ -99,7 +99,7 @@ def crawl_single_url(_url:str):
   except RequestException as e:
     logging.error('request exception: {0}'.format(e))
   finally:
-    sleep(0.5)
+    sleep(2)
 
 def crawl():
   for i in range(10):
