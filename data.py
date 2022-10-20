@@ -34,7 +34,7 @@ def standardize(tokens: List[str]) -> List[str]:
   ret = []
   for token in tokens:
     if not (token.lstrip() == '' or re.match(punctuation_pattern, token)):
-      ret.append((re.sub('\s', token)).lower())
+      ret.append((re.sub('\s', '', token)).lower())
   return ret
 
 def clear_stopwords(tokens: List[str]) -> List[str]:
