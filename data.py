@@ -1,33 +1,29 @@
 import re
 from typing import Any, List, Dict
-from nltk.tokenize import word_tokenize
 from string import punctuation
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 from csv import DictReader
-from nltk import FreqDist
-from math import log
 from wordcloud import WordCloud
+from jieba import cut
+from jieba.analyse import extract_tags
 
 def process():
   comments = get_all_comments()
-  s = comments['content']
-  nums = comments['nums']
-  reader = comments['reader']
+  s: str = comments['content']
   # 分词
-  # tokens = word_tokenize(s, 'chinese')  # 暂时没有支持 chinese
-  tokens = word_tokenize(s)
+  tokens = tokenize(s)
   # 清除标点、空白字符，统一小写
   tokens = standardize(tokens)
   # 去除停用词
   tokens = clear_stopwords(tokens)
-  # 词干提取
-  tokens = process_stem(tokens)
   # 基于 TF-IDF 提取关键词, 暂定为前100个
-  keywords = extract_keywords(tokens, reader, nums)
+  keywords = extract_tags(" ".join(tokens), topK = 100)
   # 词云
   process_wordcloud(keywords)
   return 
+
+def tokenize(s: str):
+  return list(','.join(cut(s)).split(','))
 
 def standardize(tokens: List[str]) -> List[str]:
   punctuation_pattern = re.compile('[%s]' % re.escape(punctuation))
@@ -41,10 +37,6 @@ def clear_stopwords(tokens: List[str]) -> List[str]:
   words: List[str] = stopwords.words('chinese') + stopwords.words('english')
   return [token for token in tokens if not token in words]
 
-def process_stem(tokens: List[str]) -> List[str]:
-  s = PorterStemmer()
-  return [s.stem(token) for token in tokens]
-
 def get_all_comments() -> Dict[str, Any]:
   ret = ''
   nums = 0
@@ -57,37 +49,10 @@ def get_all_comments() -> Dict[str, Any]:
   return {
     'content': ret,
     'nums': nums,
-    'reader': reader
   }
 
-def extract_keywords(tokens: List[str], reader, nums) -> List[str]:
-  # 计算 TF
-  freq = FreqDist(tokens)
-  # 计算 IDF
-  # 总文件(评论)数目除以包含该词语之文件(评论)的数目，再将得到的商取对数得到
-
-  def calc(s: str) -> float:
-    comments_nums = 0
-    for row in reader:
-      if row['comment'].find(s) != -1:
-        comments_nums += 1
-    return log(nums / comments_nums)
-
-  res = {}
-  for key, val in freq.items():
-    res.update({
-      key: val * calc(key)
-    })
-  res = sorted(res.items, key=lambda item:item[1], reverse=True)
-
-  ret = {}
-  for key, val in ret.items():
-    if len(ret) <= 100:
-      ret.update({ key: val})
-    else:
-      break
-
-  return list(ret.keys())
-
 def process_wordcloud(keywords: List[str]):
-  wc = WordCloud().generate(keywords).to_file('workcloud')
+  print(keywords)
+  WordCloud(
+    background_color='white',
+  ).generate(' '.join(keywords)).to_file('wordcloud.png')

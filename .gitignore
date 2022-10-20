@@ -131,3 +131,4 @@ cfg.yml
 *.csv
 
 __files__
+wordcloud.png
