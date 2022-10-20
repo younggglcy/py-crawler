@@ -52,7 +52,7 @@ def get_all_comments() -> Dict[str, Any]:
     reader = DictReader(f)
     for row in reader:
       ret += row['comment']
-      ret += '\n'
+      # ret += '\n'
       nums += 1
   return {
     'content': ret,

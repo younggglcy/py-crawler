@@ -1,9 +1,8 @@
-from requests import RequestException
 from urllib.parse import urljoin
 import logging
 from bs4 import BeautifulSoup as bs
 from request import req
-from csv import DictWriter
+from csv import writer
 from time import sleep
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s: %(message)s')
@@ -12,35 +11,28 @@ url = 'https://book.douban.com/top250'
 
 def crawl_comments(_url:str):
   for i in range(25):
-    page_url = urljoin(_url, '?start={0}'.format(20 * i))
-    try:
-        logging.info('start crawling comments for {0}'.format(page_url))
-        res = req(url=page_url)
-        if res:
-          with open('comments.csv', 'a') as f:
-            writer = DictWriter(f, ('recommended_level', 'user_name', 'comment'))
-            writer.writeheader()
-            soup = bs(res.text, 'html.parser')
-            comments_lists = soup.find_all('div', { 'class': 'comment' })
-            for item in comments_lists:
-              # 推荐等级
-              recommended_level = item.find('span', { 'class': 'comment-vote' }).find('a').text
-              # 用户名
-              user_name = item.find('span', { 'class': 'comment-info' }).find('a').text
-              # 短评
-              comment = item.find('span', { 'class': 'short' }).text
-              dict = {
-                'recommended_level': recommended_level,
-                'user_name': user_name,
-                'comment': comment
-              }
-              writer.writerow(dict)
-        else:
-          break
-    except RequestException as e:
-      logging.error('request exception: {0}'.format(e))
-    finally:
-      sleep(2)
+    with open('comments.csv', 'a') as comments_file:
+      comments_writer = writer(comments_file)
+      page_url = urljoin(_url, '?start={0}'.format(20 * i))
+      try:
+          logging.info('start crawling comments for {0}'.format(page_url))
+          res = req(url=page_url)
+          if res:
+              soup = bs(res.text, 'html.parser')
+              comments_lists = soup.find_all('div', { 'class': 'comment' })
+              for item in comments_lists:
+                # 推荐等级
+                recommended_level = item.find('span', { 'class': 'comment-vote' }).find('a').text
+                # 用户名
+                user_name = item.find('span', { 'class': 'comment-info' }).find('a').text
+                # 短评
+                comment = item.find('span', { 'class': 'short' }).text
+                data = [recommended_level, user_name, comment]
+                comments_writer.writerow(data)
+          else:
+            break
+      finally:
+        sleep(2)
 
 def crawl_single_url(_url:str):
   try:
@@ -48,16 +40,8 @@ def crawl_single_url(_url:str):
       url = _url,
     )
     if res:
-      with open('books.csv', 'a') as book_f:
-        writer = DictWriter(book_f, (
-          'authors',
-          'name',
-          'cover_url',
-          'intro',
-          'link',
-          'score'
-        ))
-        writer.writeheader()
+      with open('books.csv', 'a') as book_file:
+        book_writer = writer(book_file)
         soup = bs(res.text, 'html.parser')
         items = soup.select('div.indent table tr.item')
         for item in items:
@@ -86,20 +70,18 @@ def crawl_single_url(_url:str):
             intro = intro_span.get_text()
           # 详情页链接
           link = item.find('a', { 'class': 'nbg' })['href']
-          dict = {
-            'authors': authors,
-            'name': book_name,
-            'cover_url': cover_url,
-            'intro': intro,
-            'link': link,
-            'score': score
-          }
-          writer.writerow(dict)
+          book_data = [
+            authors,
+            book_name,
+            cover_url,
+            intro,
+            link,
+            score
+          ]
+          book_writer.writerow(book_data)
           crawl_comments(urljoin(link, 'comments/'))   
     else:
       return
-  except RequestException as e:
-    logging.error('request exception: {0}'.format(e))
   finally:
     sleep(2)
 
