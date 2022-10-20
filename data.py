@@ -52,7 +52,7 @@ def get_all_comments() -> Dict[str, Any]:
   }
 
 def process_wordcloud(keywords: List[str]):
-  print(keywords)
   WordCloud(
     background_color='white',
+    font_path='NotoSansCJK-Black.ttc'
   ).generate(' '.join(keywords)).to_file('wordcloud.png')
